@@ -1,0 +1,75 @@
+<div class="contact-form-wrapper py-6" {{ block.shopify_attributes }}>
+  <form method="post" action="/contact#contact_form" id="contact_form" class="max-w-xl mx-auto space-y-4">
+    {%- comment -%} Loop through dynamic inputs defined in settings {%- endcomment -%}
+    {% for i in (1..10) %}
+      {% assign type_key = 'input_type_' | append: i %}
+      {% assign label_key = 'label_text_' | append: i %}
+      {% assign placeholder_key = 'placeholder_text_' | append: i %}
+
+      {% assign type = block.settings[type_key] %}
+      {% assign label = block.settings[label_key] %}
+      {% assign placeholder = block.settings[placeholder_key] %}
+
+      {% if type != blank %}
+        {% assign auto_label = label %}
+        {% assign auto_placeholder = placeholder %}
+
+        {% if type == 'email' %}
+          {% assign auto_label = auto_label | default: 'Email' %}
+          {% assign auto_placeholder = auto_placeholder | default: 'Enter your email' %}
+        {% elsif type == 'date' %}
+          {% assign auto_label = auto_label | default: 'Date' %}
+          {% assign auto_placeholder = auto_placeholder | default: 'Select a date' %}
+        {% elsif type == 'name' %}
+          {% assign auto_label = auto_label | default: 'Name' %}
+          {% assign auto_placeholder = auto_placeholder | default: 'Enter your name' %}
+        {% else %}
+          {% assign auto_label = auto_label | default: 'Input' %}
+          {% assign auto_placeholder = auto_placeholder | default: 'Enter value' %}
+        {% endif %}
+
+        <div class="contact-form-field py-4">
+          {% if auto_label != blank %}
+            <label for="input-{{ i }}" class="block mb-2 text-sm font-medium text-gray-700">
+              {{ auto_label }}
+            </label>
+          {% endif %}
+          <input
+            id="input-{{ i }}"
+            type="{% if type == 'name' %}text{% else %}{{ type }}{% endif %}"
+            name="{{ type }}_{{ i }}"
+            placeholder="{{ auto_placeholder }}"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+      Submit
+    </button>
+  </form>
+</div>
+
+{% schema %}
+{
+  "name": "Multi-Input Contact Form",
+  "target": "section",
+  "settings": [
+    { "type": "select", "id": "input_type_1", "label": "Input Type 1", "options": [{"value":"text","label":"Plain Text"},{"value":"email","label":"Email"},{"value":"date","label":"Date"},{"value":"name","label":"Name"}], "default":"text" },
+    { "type": "text", "id": "label_text_1", "label": "Label 1"},
+    { "type": "text", "id": "placeholder_text_1", "label": "Placeholder 1"},
+
+    { "type": "select", "id": "input_type_2", "label": "Input Type 2", "options": [{"value":"text","label":"Plain Text"},{"value":"email","label":"Email"},{"value":"date","label":"Date"},{"value":"name","label":"Name"}], "default":"text" },
+    { "type": "text", "id": "label_text_2", "label": "Label 2"},
+    { "type": "text", "id": "placeholder_text_2", "label": "Placeholder 2"},
+
+    { "type": "select", "id": "input_type_3", "label": "Input Type 3", "options": [{"value":"text","label":"Plain Text"},{"value":"email","label":"Email"},{"value":"date","label":"Date"},{"value":"name","label":"Name"}], "default":"text" },
+    { "type": "text", "id": "label_text_3", "label": "Label 3"},
+    { "type": "text", "id": "placeholder_text_3", "label": "Placeholder 3"}
+
+    // Add more fields as needed, keeping defaults as non-empty string
+  ]
+}
+{% endschema %}

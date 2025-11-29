@@ -1,0 +1,66 @@
+<div class="contact-form-field py-4">
+  {% assign auto_label = block.settings.label_text %}
+  {% assign auto_placeholder = block.settings.placeholder_text %}
+
+  {% if block.settings.input_type == "email" %}
+    {% assign auto_label = auto_label | default: "Email" %}
+    {% assign auto_placeholder = auto_placeholder | default: "Enter your email" %}
+  {% elsif block.settings.input_type == "date" %}
+    {% assign auto_label = auto_label | default: "Date" %}
+    {% assign auto_placeholder = auto_placeholder | default: "Select a date" %}
+  {% elsif block.settings.input_type == "name" %}
+    {% assign auto_label = auto_label | default: "Name" %}
+    {% assign auto_placeholder = auto_placeholder | default: "Enter your name" %}
+  {% else %}
+    {% assign auto_label = auto_label | default: "Input" %}
+    {% assign auto_placeholder = auto_placeholder | default: "Enter value" %}
+  {% endif %}
+
+  {% if auto_label != blank %}
+    <label for="input-{{ block.id }}" class="block mb-2 text-sm font-medium text-gray-700">
+      {{ auto_label }}
+    </label>
+  {% endif %}
+
+  <input
+    id="input-{{ block.id }}"
+    type="{% if block.settings.input_type == 'name' %}text{% else %}{{ block.settings.input_type }}{% endif %}"
+    name="{{ block.settings.input_type }}_{{ block.id }}"
+    placeholder="{{ auto_placeholder }}"
+    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    required
+  >
+</div>
+
+{% schema %}
+{
+  "name": "Contact Form Input",
+  "target": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "input_type",
+      "label": "Input Type",
+      "options": [
+        { "value": "text", "label": "Plain Text" },
+        { "value": "email", "label": "Email" },
+        { "value": "date", "label": "Date" },
+        { "value": "name", "label": "Name" }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "text",
+      "id": "label_text",
+      "label": "Override Label",
+      "info": "Leave empty to use automatic label"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_text",
+      "label": "Override Placeholder",
+      "info": "Leave empty to use automatic placeholder"
+    }
+  ]
+}
+{% endschema %}
