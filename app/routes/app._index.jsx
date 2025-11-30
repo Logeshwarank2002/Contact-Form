@@ -1,72 +1,72 @@
 import { useEffect, useState } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
 
-export default function ContactSubmissions() {
+export default function IndexPage() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const app = useAppBridge();
+  console.log("app: ", app);
 
   useEffect(() => {
-    async function fetchSubmissions() {
+    async function loadData() {
       try {
-        // Replace with your API endpoint
-        const response = await fetch(`http://localhost:3000/contact?shop=demo-visual-market.myshopify.com`);
-        if (!response.ok) throw new Error("Failed to fetch submissions");
+        const shop = app.config.shop;
+        console.log("shop: ", shop);
+        if (!shop) {
+          console.error("Shop param missing");
+          return;
+        }
+        const tokenRes = await fetch(`/api/access_token?shop=${shop}`);
+        const { accessToken } = await tokenRes.json();
+        const contactsRes = await fetch(`/api/contact?shop=${shop}&accessToken=${accessToken}`,
+        );
+        const data = await contactsRes.json();
 
-        const data = await response.json();
         setSubmissions(data);
       } catch (err) {
-        console.error(err);
-        app.toast.show("Failed to load submissions");
+        console.error("Failed to load contacts", err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchSubmissions();
-  }, [app]);
-
-  if (loading) return <p>Loading submissions...</p>;
+    loadData();
+  }, []);
 
   return (
-    <s-page heading="Contact Form Submissions">
-      {submissions.length === 0 ? (
-        <s-paragraph>No submissions found for this shop.</s-paragraph>
+    <s-page heading="Contact Submissions">
+      {loading ? (
+        <p>Loading...</p>
+      ) : submissions.length === 0 ? (
+        <p>No submissions found.</p>
       ) : (
-        <s-stack direction="block" gap="base">
-          <s-box padding="base" borderWidth="base" borderRadius="base" background="subdued">
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ backgroundColor: "#1e3a8a", color: "white" }}>
-                  <th style={{ padding: "0.75rem", textAlign: "left" }}>Name</th>
-                  <th style={{ padding: "0.75rem", textAlign: "left" }}>Email</th>
-                  <th style={{ padding: "0.75rem", textAlign: "left" }}>Phone</th>
-                  <th style={{ padding: "0.75rem", textAlign: "left" }}>Message</th>
-                  <th style={{ padding: "0.75rem", textAlign: "left" }}>Submitted At</th>
-                </tr>
-              </thead>
-              <tbody>
-                {submissions.map((contact, idx) => (
-                  <tr
-                    key={contact.id}
-                    style={{
-                      backgroundColor: idx % 2 === 0 ? "#f3f4f6" : "white",
-                      color: "#111827",
-                    }}
-                  >
-                    <td style={{ padding: "0.75rem" }}>{contact.name}</td>
-                    <td style={{ padding: "0.75rem" }}>{contact.email}</td>
-                    <td style={{ padding: "0.75rem" }}>{contact.phoneNumber}</td>
-                    <td style={{ padding: "0.75rem" }}>{contact.message || "-"}</td>
-                    <td style={{ padding: "0.75rem" }}>
-                      {new Date(contact.submittedAt).toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </s-box>
-        </s-stack>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ backgroundColor: "#1e3a8a", color: "white" }}>
+              <th style={{ padding: "10px" }}>Name</th>
+              <th style={{ padding: "10px" }}>Email</th>
+              <th style={{ padding: "10px" }}>Phone</th>
+              <th style={{ padding: "10px" }}>Submitted at</th>
+            </tr>
+          </thead>
+          <tbody>
+            {submissions.map((contact, index) => (
+              <tr
+                key={contact.id}
+                style={{
+                  backgroundColor: index % 2 === 0 ? "#f3f4f6" : "white",
+                }}
+              >
+                <td style={{ padding: "10px" }}>{contact.name}</td>
+                <td style={{ padding: "10px" }}>{contact.email}</td>
+                <td style={{ padding: "10px" }}>{contact.phoneNumber}</td>
+                <td style={{ padding: "10px" }}>
+  {new Date(contact.submittedAt).toLocaleString()}
+</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </s-page>
   );
