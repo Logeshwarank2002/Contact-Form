@@ -1,91 +1,189 @@
-<div class="contact-form-wrapper py-6" {{ block.shopify_attributes }}>
-  {% form 'contact' %}
-    {{ form.errors | default_errors }}
-
-    <div className="first-name">
-      <label htmlFor="first-name">First name</label>
-      <input type="text" name="contact[first_name]" id="first-name">
-    </div>
-
-    <div className="last-name">
-      <label htmlFor="last-name">Last name</label>
-      <input type="text" name="contact[last_name]" id="last-name">
-    </div>
-
-    <div className="phone">
-      <label htmlFor="phone">Phone</label>
-      <input type="tel" name="contact[phone]" id="phone">
-    </div>
-
-    <div className="email">
-      <label htmlFor="email">Email</label>
-      <input type="email" name="contact[email]" id="email">
-    </div>
-
-    <div className="message">
-      <label htmlFor="message">Message</label>
-      <textarea name="contact[body]" id="message"></textarea>
-    </div>
-
-    <div className="submit">
-      <input type="submit" value="Create">
-    </div>
-  {% endform %}
-</div>
-
+{{ 'contact-form.css' | asset_url | stylesheet_tag: preload: 'true' }}
+<script src="{{ 'contact-form.js' | asset_url }}" defer></script>
 {% schema %}
 {
-  "name": "Multi-Input Contact Form",
+  "name": "Contact Form",
   "target": "section",
-  "settings": []
+  "settings": [
+    {
+      "type": "text",
+      "id": "form_title",
+      "label": "Form Title",
+      "default": "Get in Touch"
+    },
+    {
+      "type": "text",
+      "id": "first_name_label",
+      "label": "First Name Label",
+      "default": "First Name"
+    },
+    {
+      "type": "text",
+      "id": "last_name_label",
+      "label": "Last Name Label",
+      "default": "Last Name"
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email Label",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "phone_label",
+      "label": "Phone Label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "message_label",
+      "label": "Message Label",
+      "default": "Message"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Submit"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Primary Color (Button)",
+      "default": "#007bff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label Color",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input Border Color",
+      "default": "#dddddd"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button Hover Color",
+      "default": "#0056b3"
+    },
+    {
+      "type": "color",
+      "id": "success_color",
+      "label": "Success Message Color",
+      "default": "#28a745"
+    },
+    {
+      "type": "color",
+      "id": "error_color",
+      "label": "Error Message Color",
+      "default": "#dc3545"
+    }
+  ]
 }
 {% endschema %}
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.querySelector('.contact-form-wrapper form');
-    const resultDiv = document.createElement('div');
-    resultDiv.style.marginTop = '1rem';
-    form.appendChild(resultDiv);
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault(); // ❌ prevent default Shopify form submission
+<div class="contact-form-wrapper" {{ block.shopify_attributes }}>
+  <style>
+    :root {
+      --primary-color: {{ block.settings.primary_color }};
+      --text-color: {{ block.settings.text_color }};
+      --label-color: {{ block.settings.label_color }};
+      --input-border-color: {{ block.settings.input_border_color }};
+      --button-hover-color: {{ block.settings.button_hover_color }};
+      --success-color: {{ block.settings.success_color }};
+      --error-color: {{ block.settings.error_color }};
+    }
+  </style>
 
-      // Collect form values
-      const payload = {
-        shop: '{{ shop.domain }}', // Shopify shop domain from Liquid
-        name: document.getElementById('first-name').value,
-        last_name: document.getElementById('last-name').value,
-        phoneNumber: document.getElementById('phone').value,
-        email: document.getElementById('email').value,
-        body: document.getElementById('message').value,
-        // Optional: add h-captcha-response or HMAC for security
-        // "h-captcha-response": hcaptcha.getResponse()
-      };
+  <div class="contact-form-container">
+    <h2 class="form-title">{{ block.settings.form_title }}</h2>
 
-      try {
-        const response = await fetch('https://patio-evans-mom-feeling.trycloudflare.com/api/contact', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
+    <form
+      method="post"
+      action="/contact#ContactForm"
+      id="fb-ContactForm"
+      accept-charset="UTF-8"
+      class="isolate scroll-trigger animate--slide-in"
+    >
+      <input type="hidden" name="form_type" value="contact">
+      <input type="hidden" name="utf8" value="✓">
 
-        const data = await response.json();
+      <div class="form-group">
+        <label for="ContactForm-name" class="form-label">{{ block.settings.first_name_label }}</label>
+        <input
+          type="text"
+          id="ContactForm-name"
+          name="contact[name]"
+          class="form-input"
+          placeholder="Enter your first name"
+          required
+        >
+        <span class="error-text"></span>
+      </div>
 
-        if (response.ok) {
-          resultDiv.style.color = 'green';
-          resultDiv.textContent = 'Form submitted successfully!';
-          form.reset();
-        } else {
-          resultDiv.style.color = 'red';
-          resultDiv.textContent = 'Error: ' + data.error;
-        }
-      } catch (error) {
-        console.error(error);
-        resultDiv.style.color = 'red';
-        resultDiv.textContent = 'Failed to submit form.';
-      }
-    });
-  });
-</script>
+      <div class="form-group">
+        <label for="ContactForm-last-name" class="form-label">{{ block.settings.last_name_label }}</label>
+        <input
+          type="text"
+          id="ContactForm-last-name"
+          name="contact[last_name]"
+          class="form-input"
+          placeholder="Enter your last name"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="ContactForm-email" class="form-label">{{ block.settings.email_label }}</label>
+        <input
+          type="email"
+          id="ContactForm-email"
+          class="form-input"
+          placeholder="Enter your email"
+          name="contact[email]"
+          required
+        >
+        <span class="error-text"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="ContactForm-phone" class="form-label">{{ block.settings.phone_label }}</label>
+        <input
+          type="tel"
+          id="ContactForm-phone"
+          class="form-input"
+          name="contact[phone]"
+          placeholder="Enter your phone number"
+        >
+        <span class="error-text"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="ContactForm-body" class="form-label">{{ block.settings.message_label }}</label>
+        <textarea
+          id="ContactForm-body"
+          class="form-textarea"
+          placeholder="Enter your message"
+          name="contact[body]"
+          rows="5"
+        ></textarea>
+      </div>
+
+      <button type="button" class="form-button" id="fb-submitBtn">
+        {{ block.settings.button_text }}
+      </button>
+    </form>
+
+    <div id="result" class="result-message"></div>
+  </div>
+</div>

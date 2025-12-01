@@ -2,12 +2,11 @@
 
 client_id = "256980fc1ae255df33afccec63c84e05"
 name = "Form Builder"
-application_url = "https://example.com"
+application_url = "https://86a866df8824.ngrok-free.app"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-include_config_on_deploy = true
 
 [webhooks]
 api_version = "2026-01"
@@ -25,4 +24,8 @@ api_version = "2026-01"
 scopes = "write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://86a866df8824.ngrok-free.app/auth/callback",
+  "https://86a866df8824.ngrok-free.app/auth/shopify/callback",
+  "https://86a866df8824.ngrok-free.app/api/auth/callback"
+]
