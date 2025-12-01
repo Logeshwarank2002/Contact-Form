@@ -1,4 +1,5 @@
 {{ 'contact-form.css' | asset_url | stylesheet_tag: preload: 'true' }}
+<script src="{{ 'contact-form.js' | asset_url }}" defer></script>
 {% schema %}
 {
   "name": "Contact Form",
@@ -186,73 +187,3 @@
     <div id="result" class="result-message"></div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('fb-ContactForm');
-    const resultDiv = document.getElementById('result');
-    const submitBtn = document.getElementById('fb-submitBtn');
-
-    if (!form) {
-      console.error('ContactForm not found');
-      return;
-    }
-
-    submitBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      document.querySelectorAll('.error-text').forEach((el) => (el.textContent = ''));
-      resultDiv.textContent = '';
-      resultDiv.className = 'result-message';
-
-      const formData = new FormData(form);
-
-      const firstName = formData.get('contact[name]')?.trim() || '';
-      const lastName = formData.get('contact[last_name]')?.trim() || '';
-      const email = formData.get('contact[email]')?.trim() || '';
-      const phone = formData.get('contact[phone]')?.trim() || '';
-      const message = formData.get('contact[body]')?.trim() || '';
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
-
-      const payload = {
-        shop: '{{ shop.domain }}',
-        name: firstName,
-        last_name: lastName,
-        phoneNumber: phone,
-        email: email,
-        body: message,
-      };
-
-      try {
-        console.log('Submitting payload:', payload);
-        const response = await fetch('https://86a866df8824.ngrok-free.app/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          resultDiv.classList.add('error');
-          resultDiv.textContent = 'Error: ' + (data.error || 'Unknown error');
-          submitBtn.disabled = false;
-          submitBtn.textContent = '{{ block.settings.button_text }}';
-          return;
-        }
-
-        submitBtn.disabled = true;
-        form.submit();
-        resultDiv.classList.add('success');
-        resultDiv.textContent = 'Form submitted successfully!';
-      } catch (error) {
-        console.error('Submission error:', error);
-        resultDiv.classList.add('error');
-        resultDiv.textContent = 'Failed to submit form. Please try again.';
-        submitBtn.disabled = false;
-        submitBtn.textContent = '{{ block.settings.button_text }}';
-      }
-    });
-  });
-</script>
