@@ -48,9 +48,8 @@
     form.appendChild(resultDiv);
 
     form.addEventListener('submit', async (e) => {
-      e.preventDefault(); // ❌ prevent default Shopify form submission
+      e.preventDefault();
 
-      // Collect form values
       const payload = {
         shop: '{{ shop.domain }}', // Shopify shop domain from Liquid
         name: document.getElementById('first-name').value,
@@ -58,16 +57,12 @@
         phoneNumber: document.getElementById('phone').value,
         email: document.getElementById('email').value,
         body: document.getElementById('message').value,
-        // Optional: add h-captcha-response or HMAC for security
-        // "h-captcha-response": hcaptcha.getResponse()
       };
 
       try {
-        const response = await fetch('https://patio-evans-mom-feeling.trycloudflare.com/api/contact', {
+        const response = await fetch('https://86a866df8824.ngrok-free.app/api/contact', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
 

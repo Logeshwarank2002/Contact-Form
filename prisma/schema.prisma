@@ -26,12 +26,20 @@ model Session {
 }
 
 model ContactForm {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   shop         String
   name         String
   phoneNumber  String
   email        String
   submittedAt  DateTime @default(now())
   isDeleted    Boolean  @default(false)
+  messages     Message[] // Relationship to the Message model
 }
 
+model Message {
+  id          String   @id @default(cuid())
+  content     String
+  contactId   String   // Foreign key to ContactForm
+  createdAt   DateTime @default(now()) // Timestamp when the message was added
+  contactForm ContactForm @relation(fields: [contactId], references: [id])
+}
