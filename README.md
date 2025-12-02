@@ -173,4 +173,7 @@ Panel](./screenshots/admin.png)
 
 ## 🎥 Screen Recording
 
-*Add your Loom / YouTube recording link here.*
+![App Running record] (https://www.loom.com/share/8d7940525a264abebe8fa989f9cab4e9)
+
+## Short demo video
+[Form submission flow] (https://www.loom.com/share/d8e9d4e305e54630a525ee819cce1d98)
