@@ -8,7 +8,7 @@ function initContactForm() {
         return;
     }
 
-    const API_URL = 'https://86a866df8824.ngrok-free.app/api/contact';
+    const API_URL = 'https://525908eb4569.ngrok-free.app/api/contact';
     const SHOP_DOMAIN = window?.Shopify?.shop || '';
     const DEFAULT_BUTTON_TEXT = submitBtn.textContent.trim();
 
